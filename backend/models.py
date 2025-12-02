@@ -11,6 +11,9 @@ class User(Base):
     phone = Column(String, nullable=False)
     password_hash = Column(String, nullable=False)
     is_admin = Column(Boolean, default=False, nullable=False)
+    
+    reviews = relationship('Review', back_populates='user')
+    questions = relationship('Question', back_populates='user')
 
 class Review(Base):
     __tablename__ = 'reviews'
@@ -23,7 +26,7 @@ class Review(Base):
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     admin_reply = Column(Text, nullable=True)
 
-    user = relationship('User', backref='reviews')
+    user = relationship('User', foreign_keys=[user_id], primaryjoin='Review.user_id == User.id', back_populates='reviews')
 
 class Question(Base):
     __tablename__ = 'questions'
@@ -36,7 +39,7 @@ class Question(Base):
     admin_reply = Column(Text, nullable=True)
     is_read = Column(Boolean, default=False, nullable=False)
 
-    user = relationship('User', backref='questions')
+    user = relationship('User', foreign_keys=[user_id], primaryjoin='Question.user_id == User.id', back_populates='questions')
 
 class Specialist(Base):
     __tablename__ = 'specialists'
