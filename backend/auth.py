@@ -65,7 +65,7 @@ def register_admin(user: schemas.UserCreate, db: Session = Depends(get_db)):
         raise HTTPException(status_code=400, detail="Email уже зарегистрирован")
     
     # Проверяем специальный email для создания админа
-    if user.email != 'admin@biosfera.ru':
+    if user.email != 'admin@biosphere.ru':
         raise HTTPException(status_code=403, detail="Доступ запрещен")
     
     db_user = User(

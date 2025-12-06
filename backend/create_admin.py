@@ -5,7 +5,7 @@ from auth import get_password_hash
 def create_admin():
     db = SessionLocal()
     try:
-        admin_email = "admin@biosfera.ru"
+        admin_email = "admin@biosphere.ru"
         admin_password = "ADMINBIO"
         
         existing_admin = db.query(User).filter(User.is_admin == True).first()

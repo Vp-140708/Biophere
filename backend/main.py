@@ -31,9 +31,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Создать таблицы при первом запуске (для разработки)
-Base.metadata.create_all(bind=engine)
-
 app.include_router(auth_router)
 app.include_router(users_router)
 app.include_router(reviews_router)
@@ -43,10 +40,31 @@ app.include_router(specialists_router)
 @app.on_event("startup")
 def on_startup():
     print("=== BIOSPHERE API STARTED ===")
+    # Создать таблицы только для SQLite (локальная разработка)
+    # Для PostgreSQL используйте миграции Alembic
+    from database import DATABASE_URL
+    if DATABASE_URL.startswith('sqlite'):
+        try:
+            Base.metadata.create_all(bind=engine)
+            print("Database tables created/verified")
+        except Exception as e:
+            print(f"Warning: Could not create tables: {e}")
 
 @app.get("/")
 def root():
-    return {"message": "biosphere API is running"}
+    return {"message": "biosphere API is running", "status": "ok"}
+
+@app.get("/health")
+def health_check():
+    """Health check endpoint for Render"""
+    try:
+        from sqlalchemy import text
+        db = SessionLocal()
+        db.execute(text("SELECT 1"))
+        db.close()
+        return {"status": "healthy", "database": "connected"}
+    except Exception as e:
+        return {"status": "unhealthy", "error": str(e)}, 503
 
 @app.post("/admin/clear_all")
 def clear_all():
